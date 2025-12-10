@@ -35,10 +35,20 @@ client = WitanLabs(
     api_key=os.environ.get("WITAN_API_KEY"),  # This is the default and can be omitted
 )
 
-file = client.files.retrieve(
-    "x",
+response = client.responses.create(
+    input=[
+        {
+            "content": [
+                {
+                    "text": "x",
+                    "type": "input_text",
+                }
+            ],
+            "role": "user",
+        }
+    ],
 )
-print(file.id)
+print(response.id)
 ```
 
 While you can provide an `api_key` keyword argument,
@@ -61,10 +71,20 @@ client = AsyncWitanLabs(
 
 
 async def main() -> None:
-    file = await client.files.retrieve(
-        "x",
+    response = await client.responses.create(
+        input=[
+            {
+                "content": [
+                    {
+                        "text": "x",
+                        "type": "input_text",
+                    }
+                ],
+                "role": "user",
+            }
+        ],
     )
-    print(file.id)
+    print(response.id)
 
 
 asyncio.run(main())
@@ -97,10 +117,20 @@ async def main() -> None:
         api_key=os.environ.get("WITAN_API_KEY"),  # This is the default and can be omitted
         http_client=DefaultAioHttpClient(),
     ) as client:
-        file = await client.files.retrieve(
-            "x",
+        response = await client.responses.create(
+            input=[
+                {
+                    "content": [
+                        {
+                            "text": "x",
+                            "type": "input_text",
+                        }
+                    ],
+                    "role": "user",
+                }
+            ],
         )
-        print(file.id)
+        print(response.id)
 
 
 asyncio.run(main())
@@ -131,9 +161,7 @@ from witan import WitanLabs
 client = WitanLabs()
 
 try:
-    client.files.retrieve(
-        "x",
-    )
+    client.files.list()
 except witan.APIConnectionError as e:
     print("The server could not be reached")
     print(e.__cause__)  # an underlying Exception, likely raised within httpx.
@@ -176,9 +204,7 @@ client = WitanLabs(
 )
 
 # Or, configure per-request:
-client.with_options(max_retries=5).files.retrieve(
-    "x",
-)
+client.with_options(max_retries=5).files.list()
 ```
 
 ### Timeouts
@@ -201,9 +227,7 @@ client = WitanLabs(
 )
 
 # Override per-request:
-client.with_options(timeout=5.0).files.retrieve(
-    "x",
-)
+client.with_options(timeout=5.0).files.list()
 ```
 
 On timeout, an `APITimeoutError` is thrown.
@@ -244,13 +268,11 @@ The "raw" Response object can be accessed by prefixing `.with_raw_response.` to 
 from witan import WitanLabs
 
 client = WitanLabs()
-response = client.files.with_raw_response.retrieve(
-    "x",
-)
+response = client.files.with_raw_response.list()
 print(response.headers.get('X-My-Header'))
 
-file = response.parse()  # get the object that `files.retrieve()` would have returned
-print(file.id)
+file = response.parse()  # get the object that `files.list()` would have returned
+print(file.first_id)
 ```
 
 These methods return an [`APIResponse`](https://github.com/stainless-sdks/witan-python/tree/main/src/witan/_response.py) object.
@@ -264,9 +286,7 @@ The above interface eagerly reads the full response body when you make the reque
 To stream the response body, use `.with_streaming_response` instead, which requires a context manager and only reads the response body once you call `.read()`, `.text()`, `.json()`, `.iter_bytes()`, `.iter_text()`, `.iter_lines()` or `.parse()`. In the async client, these are async methods.
 
 ```python
-with client.files.with_streaming_response.retrieve(
-    "x",
-) as response:
+with client.files.with_streaming_response.list() as response:
     print(response.headers.get("X-My-Header"))
 
     for line in response.iter_lines():
