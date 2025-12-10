@@ -1,9 +1,9 @@
-# Witan Labs Python API library
+# Witan Python API library
 
 <!-- prettier-ignore -->
 [![PyPI version](https://img.shields.io/pypi/v/witan.svg?label=pypi%20(stable))](https://pypi.org/project/witan/)
 
-The Witan Labs Python library provides convenient access to the Witan Labs REST API from any Python 3.9+
+The Witan Python library provides convenient access to the Witan REST API from any Python 3.9+
 application. The library includes type definitions for all request params and response fields,
 and offers both synchronous and asynchronous clients powered by [httpx](https://github.com/encode/httpx).
 
@@ -29,9 +29,9 @@ The full API of this library can be found in [api.md](api.md).
 
 ```python
 import os
-from witan import WitanLabs
+from witan import Witan
 
-client = WitanLabs(
+client = Witan(
     api_key=os.environ.get("WITAN_API_KEY"),  # This is the default and can be omitted
 )
 
@@ -58,14 +58,14 @@ so that your API Key is not stored in source control.
 
 ## Async usage
 
-Simply import `AsyncWitanLabs` instead of `WitanLabs` and use `await` with each API call:
+Simply import `AsyncWitan` instead of `Witan` and use `await` with each API call:
 
 ```python
 import os
 import asyncio
-from witan import AsyncWitanLabs
+from witan import AsyncWitan
 
-client = AsyncWitanLabs(
+client = AsyncWitan(
     api_key=os.environ.get("WITAN_API_KEY"),  # This is the default and can be omitted
 )
 
@@ -109,11 +109,11 @@ Then you can enable it by instantiating the client with `http_client=DefaultAioH
 import os
 import asyncio
 from witan import DefaultAioHttpClient
-from witan import AsyncWitanLabs
+from witan import AsyncWitan
 
 
 async def main() -> None:
-    async with AsyncWitanLabs(
+    async with AsyncWitan(
         api_key=os.environ.get("WITAN_API_KEY"),  # This is the default and can be omitted
         http_client=DefaultAioHttpClient(),
     ) as client:
@@ -156,9 +156,9 @@ All errors inherit from `witan.APIError`.
 
 ```python
 import witan
-from witan import WitanLabs
+from witan import Witan
 
-client = WitanLabs()
+client = Witan()
 
 try:
     client.files.list()
@@ -195,10 +195,10 @@ Connection errors (for example, due to a network connectivity problem), 408 Requ
 You can use the `max_retries` option to configure or disable retry settings:
 
 ```python
-from witan import WitanLabs
+from witan import Witan
 
 # Configure the default for all requests:
-client = WitanLabs(
+client = Witan(
     # default is 2
     max_retries=0,
 )
@@ -213,16 +213,16 @@ By default requests time out after 1 minute. You can configure this with a `time
 which accepts a float or an [`httpx.Timeout`](https://www.python-httpx.org/advanced/timeouts/#fine-tuning-the-configuration) object:
 
 ```python
-from witan import WitanLabs
+from witan import Witan
 
 # Configure the default for all requests:
-client = WitanLabs(
+client = Witan(
     # 20 seconds (default is 1 minute)
     timeout=20.0,
 )
 
 # More granular control:
-client = WitanLabs(
+client = Witan(
     timeout=httpx.Timeout(60.0, read=5.0, write=10.0, connect=2.0),
 )
 
@@ -240,10 +240,10 @@ Note that requests that time out are [retried twice by default](#retries).
 
 We use the standard library [`logging`](https://docs.python.org/3/library/logging.html) module.
 
-You can enable logging by setting the environment variable `WITAN_LABS_LOG` to `info`.
+You can enable logging by setting the environment variable `WITAN_LOG` to `info`.
 
 ```shell
-$ export WITAN_LABS_LOG=info
+$ export WITAN_LOG=info
 ```
 
 Or to `debug` for more verbose logging.
@@ -265,9 +265,9 @@ if response.my_field is None:
 The "raw" Response object can be accessed by prefixing `.with_raw_response.` to any HTTP method call, e.g.,
 
 ```py
-from witan import WitanLabs
+from witan import Witan
 
-client = WitanLabs()
+client = Witan()
 response = client.files.with_raw_response.list()
 print(response.headers.get('X-My-Header'))
 
@@ -339,10 +339,10 @@ You can directly override the [httpx client](https://www.python-httpx.org/api/#c
 
 ```python
 import httpx
-from witan import WitanLabs, DefaultHttpxClient
+from witan import Witan, DefaultHttpxClient
 
-client = WitanLabs(
-    # Or use the `WITAN_LABS_BASE_URL` env var
+client = Witan(
+    # Or use the `WITAN_BASE_URL` env var
     base_url="http://my.test.server.example.com:8083",
     http_client=DefaultHttpxClient(
         proxy="http://my.test.proxy.example.com",
@@ -362,9 +362,9 @@ client.with_options(http_client=DefaultHttpxClient(...))
 By default the library closes underlying HTTP connections whenever the client is [garbage collected](https://docs.python.org/3/reference/datamodel.html#object.__del__). You can manually close the client using the `.close()` method if desired, or with a context manager that closes when exiting.
 
 ```py
-from witan import WitanLabs
+from witan import Witan
 
-with WitanLabs() as client:
+with Witan() as client:
   # make requests here
   ...
 

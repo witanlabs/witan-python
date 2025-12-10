@@ -31,23 +31,14 @@ from ._base_client import (
     AsyncAPIClient,
 )
 
-__all__ = [
-    "Timeout",
-    "Transport",
-    "ProxiesTypes",
-    "RequestOptions",
-    "WitanLabs",
-    "AsyncWitanLabs",
-    "Client",
-    "AsyncClient",
-]
+__all__ = ["Timeout", "Transport", "ProxiesTypes", "RequestOptions", "Witan", "AsyncWitan", "Client", "AsyncClient"]
 
 
-class WitanLabs(SyncAPIClient):
+class Witan(SyncAPIClient):
     files: files.FilesResource
     responses: responses.ResponsesResource
-    with_raw_response: WitanLabsWithRawResponse
-    with_streaming_response: WitanLabsWithStreamedResponse
+    with_raw_response: WitanWithRawResponse
+    with_streaming_response: WitanWithStreamedResponse
 
     # client options
     api_key: str | None
@@ -75,7 +66,7 @@ class WitanLabs(SyncAPIClient):
         # part of our public interface in the future.
         _strict_response_validation: bool = False,
     ) -> None:
-        """Construct a new synchronous WitanLabs client instance.
+        """Construct a new synchronous Witan client instance.
 
         This automatically infers the `api_key` argument from the `WITAN_API_KEY` environment variable if it is not provided.
         """
@@ -84,7 +75,7 @@ class WitanLabs(SyncAPIClient):
         self.api_key = api_key
 
         if base_url is None:
-            base_url = os.environ.get("WITAN_LABS_BASE_URL")
+            base_url = os.environ.get("WITAN_BASE_URL")
         if base_url is None:
             base_url = f"https://api.dev.witanlabs.com"
 
@@ -101,8 +92,8 @@ class WitanLabs(SyncAPIClient):
 
         self.files = files.FilesResource(self)
         self.responses = responses.ResponsesResource(self)
-        self.with_raw_response = WitanLabsWithRawResponse(self)
-        self.with_streaming_response = WitanLabsWithStreamedResponse(self)
+        self.with_raw_response = WitanWithRawResponse(self)
+        self.with_streaming_response = WitanWithStreamedResponse(self)
 
     @property
     @override
@@ -222,11 +213,11 @@ class WitanLabs(SyncAPIClient):
         return APIStatusError(err_msg, response=response, body=body)
 
 
-class AsyncWitanLabs(AsyncAPIClient):
+class AsyncWitan(AsyncAPIClient):
     files: files.AsyncFilesResource
     responses: responses.AsyncResponsesResource
-    with_raw_response: AsyncWitanLabsWithRawResponse
-    with_streaming_response: AsyncWitanLabsWithStreamedResponse
+    with_raw_response: AsyncWitanWithRawResponse
+    with_streaming_response: AsyncWitanWithStreamedResponse
 
     # client options
     api_key: str | None
@@ -254,7 +245,7 @@ class AsyncWitanLabs(AsyncAPIClient):
         # part of our public interface in the future.
         _strict_response_validation: bool = False,
     ) -> None:
-        """Construct a new async AsyncWitanLabs client instance.
+        """Construct a new async AsyncWitan client instance.
 
         This automatically infers the `api_key` argument from the `WITAN_API_KEY` environment variable if it is not provided.
         """
@@ -263,7 +254,7 @@ class AsyncWitanLabs(AsyncAPIClient):
         self.api_key = api_key
 
         if base_url is None:
-            base_url = os.environ.get("WITAN_LABS_BASE_URL")
+            base_url = os.environ.get("WITAN_BASE_URL")
         if base_url is None:
             base_url = f"https://api.dev.witanlabs.com"
 
@@ -280,8 +271,8 @@ class AsyncWitanLabs(AsyncAPIClient):
 
         self.files = files.AsyncFilesResource(self)
         self.responses = responses.AsyncResponsesResource(self)
-        self.with_raw_response = AsyncWitanLabsWithRawResponse(self)
-        self.with_streaming_response = AsyncWitanLabsWithStreamedResponse(self)
+        self.with_raw_response = AsyncWitanWithRawResponse(self)
+        self.with_streaming_response = AsyncWitanWithStreamedResponse(self)
 
     @property
     @override
@@ -401,30 +392,30 @@ class AsyncWitanLabs(AsyncAPIClient):
         return APIStatusError(err_msg, response=response, body=body)
 
 
-class WitanLabsWithRawResponse:
-    def __init__(self, client: WitanLabs) -> None:
+class WitanWithRawResponse:
+    def __init__(self, client: Witan) -> None:
         self.files = files.FilesResourceWithRawResponse(client.files)
         self.responses = responses.ResponsesResourceWithRawResponse(client.responses)
 
 
-class AsyncWitanLabsWithRawResponse:
-    def __init__(self, client: AsyncWitanLabs) -> None:
+class AsyncWitanWithRawResponse:
+    def __init__(self, client: AsyncWitan) -> None:
         self.files = files.AsyncFilesResourceWithRawResponse(client.files)
         self.responses = responses.AsyncResponsesResourceWithRawResponse(client.responses)
 
 
-class WitanLabsWithStreamedResponse:
-    def __init__(self, client: WitanLabs) -> None:
+class WitanWithStreamedResponse:
+    def __init__(self, client: Witan) -> None:
         self.files = files.FilesResourceWithStreamingResponse(client.files)
         self.responses = responses.ResponsesResourceWithStreamingResponse(client.responses)
 
 
-class AsyncWitanLabsWithStreamedResponse:
-    def __init__(self, client: AsyncWitanLabs) -> None:
+class AsyncWitanWithStreamedResponse:
+    def __init__(self, client: AsyncWitan) -> None:
         self.files = files.AsyncFilesResourceWithStreamingResponse(client.files)
         self.responses = responses.AsyncResponsesResourceWithStreamingResponse(client.responses)
 
 
-Client = WitanLabs
+Client = Witan
 
-AsyncClient = AsyncWitanLabs
+AsyncClient = AsyncWitan

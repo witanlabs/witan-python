@@ -18,11 +18,11 @@ __all__ = [
 ]
 
 
-class WitanLabsError(Exception):
+class WitanError(Exception):
     pass
 
 
-class APIError(WitanLabsError):
+class APIError(WitanError):
     message: str
     request: httpx.Request
 
