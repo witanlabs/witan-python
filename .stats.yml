@@ -1,4 +1,4 @@
-configured_endpoints: 5
-openapi_spec_url: https://storage.googleapis.com/stainless-sdk-openapi-specs/witan-labs--inc-dash%2Fwitan-04d764eeb573ac028d542df3900ac8217f7681e951aad8a8f5082abf033cf97b.yml
-openapi_spec_hash: 14ddf30b64c9788f8e33599d91f1aa53
-config_hash: 0203eac1c689e4f53a9a014e407dd15c
+configured_endpoints: 6
+openapi_spec_url: https://storage.googleapis.com/stainless-sdk-openapi-specs/witan-labs--inc-dash%2Fwitan-118e2caf7bb0e5fcb862432ef2ce692486d5c737c394d5d54568a07b15038882.yml
+openapi_spec_hash: c0c299ceb63f023f87528d27825ffa94
+config_hash: 9a2c41e7acc51c65a3f87edd3e605182

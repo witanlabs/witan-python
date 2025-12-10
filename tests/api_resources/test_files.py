@@ -9,7 +9,7 @@ import httpx
 import pytest
 from respx import MockRouter
 
-from witan import Witan, AsyncWitan
+from witan import WitanLabs, AsyncWitanLabs
 from tests.utils import assert_matches_type
 from witan.types import FileListResponse, FileDeleteResponse, FileUploadResponse, FileRetrieveResponse
 from witan._response import (
@@ -27,7 +27,7 @@ class TestFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    def test_method_retrieve(self, client: Witan) -> None:
+    def test_method_retrieve(self, client: WitanLabs) -> None:
         file = client.files.retrieve(
             "x",
         )
@@ -35,7 +35,7 @@ class TestFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    def test_raw_response_retrieve(self, client: Witan) -> None:
+    def test_raw_response_retrieve(self, client: WitanLabs) -> None:
         response = client.files.with_raw_response.retrieve(
             "x",
         )
@@ -47,7 +47,7 @@ class TestFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    def test_streaming_response_retrieve(self, client: Witan) -> None:
+    def test_streaming_response_retrieve(self, client: WitanLabs) -> None:
         with client.files.with_streaming_response.retrieve(
             "x",
         ) as response:
@@ -61,7 +61,7 @@ class TestFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    def test_path_params_retrieve(self, client: Witan) -> None:
+    def test_path_params_retrieve(self, client: WitanLabs) -> None:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `file_id` but received ''"):
             client.files.with_raw_response.retrieve(
                 "",
@@ -69,13 +69,13 @@ class TestFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    def test_method_list(self, client: Witan) -> None:
+    def test_method_list(self, client: WitanLabs) -> None:
         file = client.files.list()
         assert_matches_type(FileListResponse, file, path=["response"])
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    def test_method_list_with_all_params(self, client: Witan) -> None:
+    def test_method_list_with_all_params(self, client: WitanLabs) -> None:
         file = client.files.list(
             after="x",
             limit=1,
@@ -84,7 +84,7 @@ class TestFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    def test_raw_response_list(self, client: Witan) -> None:
+    def test_raw_response_list(self, client: WitanLabs) -> None:
         response = client.files.with_raw_response.list()
 
         assert response.is_closed is True
@@ -94,7 +94,7 @@ class TestFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    def test_streaming_response_list(self, client: Witan) -> None:
+    def test_streaming_response_list(self, client: WitanLabs) -> None:
         with client.files.with_streaming_response.list() as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -106,7 +106,7 @@ class TestFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    def test_method_delete(self, client: Witan) -> None:
+    def test_method_delete(self, client: WitanLabs) -> None:
         file = client.files.delete(
             "x",
         )
@@ -114,7 +114,7 @@ class TestFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    def test_raw_response_delete(self, client: Witan) -> None:
+    def test_raw_response_delete(self, client: WitanLabs) -> None:
         response = client.files.with_raw_response.delete(
             "x",
         )
@@ -126,7 +126,7 @@ class TestFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    def test_streaming_response_delete(self, client: Witan) -> None:
+    def test_streaming_response_delete(self, client: WitanLabs) -> None:
         with client.files.with_streaming_response.delete(
             "x",
         ) as response:
@@ -140,7 +140,7 @@ class TestFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    def test_path_params_delete(self, client: Witan) -> None:
+    def test_path_params_delete(self, client: WitanLabs) -> None:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `file_id` but received ''"):
             client.files.with_raw_response.delete(
                 "",
@@ -148,8 +148,8 @@ class TestFiles:
 
     @parametrize
     @pytest.mark.respx(base_url=base_url)
-    def test_method_get_content(self, client: Witan, respx_mock: MockRouter) -> None:
-        respx_mock.get("/v1/files/x/content").mock(return_value=httpx.Response(200, json={"foo": "bar"}))
+    def test_method_get_content(self, client: WitanLabs, respx_mock: MockRouter) -> None:
+        respx_mock.get("/v0/files/x/content").mock(return_value=httpx.Response(200, json={"foo": "bar"}))
         file = client.files.get_content(
             "x",
         )
@@ -160,8 +160,8 @@ class TestFiles:
 
     @parametrize
     @pytest.mark.respx(base_url=base_url)
-    def test_raw_response_get_content(self, client: Witan, respx_mock: MockRouter) -> None:
-        respx_mock.get("/v1/files/x/content").mock(return_value=httpx.Response(200, json={"foo": "bar"}))
+    def test_raw_response_get_content(self, client: WitanLabs, respx_mock: MockRouter) -> None:
+        respx_mock.get("/v0/files/x/content").mock(return_value=httpx.Response(200, json={"foo": "bar"}))
 
         file = client.files.with_raw_response.get_content(
             "x",
@@ -174,8 +174,8 @@ class TestFiles:
 
     @parametrize
     @pytest.mark.respx(base_url=base_url)
-    def test_streaming_response_get_content(self, client: Witan, respx_mock: MockRouter) -> None:
-        respx_mock.get("/v1/files/x/content").mock(return_value=httpx.Response(200, json={"foo": "bar"}))
+    def test_streaming_response_get_content(self, client: WitanLabs, respx_mock: MockRouter) -> None:
+        respx_mock.get("/v0/files/x/content").mock(return_value=httpx.Response(200, json={"foo": "bar"}))
         with client.files.with_streaming_response.get_content(
             "x",
         ) as file:
@@ -190,7 +190,7 @@ class TestFiles:
 
     @parametrize
     @pytest.mark.respx(base_url=base_url)
-    def test_path_params_get_content(self, client: Witan) -> None:
+    def test_path_params_get_content(self, client: WitanLabs) -> None:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `file_id` but received ''"):
             client.files.with_raw_response.get_content(
                 "",
@@ -198,13 +198,13 @@ class TestFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    def test_method_upload(self, client: Witan) -> None:
+    def test_method_upload(self, client: WitanLabs) -> None:
         file = client.files.upload()
         assert_matches_type(FileUploadResponse, file, path=["response"])
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    def test_raw_response_upload(self, client: Witan) -> None:
+    def test_raw_response_upload(self, client: WitanLabs) -> None:
         response = client.files.with_raw_response.upload()
 
         assert response.is_closed is True
@@ -214,7 +214,7 @@ class TestFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    def test_streaming_response_upload(self, client: Witan) -> None:
+    def test_streaming_response_upload(self, client: WitanLabs) -> None:
         with client.files.with_streaming_response.upload() as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -232,7 +232,7 @@ class TestAsyncFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    async def test_method_retrieve(self, async_client: AsyncWitan) -> None:
+    async def test_method_retrieve(self, async_client: AsyncWitanLabs) -> None:
         file = await async_client.files.retrieve(
             "x",
         )
@@ -240,7 +240,7 @@ class TestAsyncFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    async def test_raw_response_retrieve(self, async_client: AsyncWitan) -> None:
+    async def test_raw_response_retrieve(self, async_client: AsyncWitanLabs) -> None:
         response = await async_client.files.with_raw_response.retrieve(
             "x",
         )
@@ -252,7 +252,7 @@ class TestAsyncFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    async def test_streaming_response_retrieve(self, async_client: AsyncWitan) -> None:
+    async def test_streaming_response_retrieve(self, async_client: AsyncWitanLabs) -> None:
         async with async_client.files.with_streaming_response.retrieve(
             "x",
         ) as response:
@@ -266,7 +266,7 @@ class TestAsyncFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    async def test_path_params_retrieve(self, async_client: AsyncWitan) -> None:
+    async def test_path_params_retrieve(self, async_client: AsyncWitanLabs) -> None:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `file_id` but received ''"):
             await async_client.files.with_raw_response.retrieve(
                 "",
@@ -274,13 +274,13 @@ class TestAsyncFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    async def test_method_list(self, async_client: AsyncWitan) -> None:
+    async def test_method_list(self, async_client: AsyncWitanLabs) -> None:
         file = await async_client.files.list()
         assert_matches_type(FileListResponse, file, path=["response"])
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    async def test_method_list_with_all_params(self, async_client: AsyncWitan) -> None:
+    async def test_method_list_with_all_params(self, async_client: AsyncWitanLabs) -> None:
         file = await async_client.files.list(
             after="x",
             limit=1,
@@ -289,7 +289,7 @@ class TestAsyncFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    async def test_raw_response_list(self, async_client: AsyncWitan) -> None:
+    async def test_raw_response_list(self, async_client: AsyncWitanLabs) -> None:
         response = await async_client.files.with_raw_response.list()
 
         assert response.is_closed is True
@@ -299,7 +299,7 @@ class TestAsyncFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    async def test_streaming_response_list(self, async_client: AsyncWitan) -> None:
+    async def test_streaming_response_list(self, async_client: AsyncWitanLabs) -> None:
         async with async_client.files.with_streaming_response.list() as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -311,7 +311,7 @@ class TestAsyncFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    async def test_method_delete(self, async_client: AsyncWitan) -> None:
+    async def test_method_delete(self, async_client: AsyncWitanLabs) -> None:
         file = await async_client.files.delete(
             "x",
         )
@@ -319,7 +319,7 @@ class TestAsyncFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    async def test_raw_response_delete(self, async_client: AsyncWitan) -> None:
+    async def test_raw_response_delete(self, async_client: AsyncWitanLabs) -> None:
         response = await async_client.files.with_raw_response.delete(
             "x",
         )
@@ -331,7 +331,7 @@ class TestAsyncFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    async def test_streaming_response_delete(self, async_client: AsyncWitan) -> None:
+    async def test_streaming_response_delete(self, async_client: AsyncWitanLabs) -> None:
         async with async_client.files.with_streaming_response.delete(
             "x",
         ) as response:
@@ -345,7 +345,7 @@ class TestAsyncFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    async def test_path_params_delete(self, async_client: AsyncWitan) -> None:
+    async def test_path_params_delete(self, async_client: AsyncWitanLabs) -> None:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `file_id` but received ''"):
             await async_client.files.with_raw_response.delete(
                 "",
@@ -353,8 +353,8 @@ class TestAsyncFiles:
 
     @parametrize
     @pytest.mark.respx(base_url=base_url)
-    async def test_method_get_content(self, async_client: AsyncWitan, respx_mock: MockRouter) -> None:
-        respx_mock.get("/v1/files/x/content").mock(return_value=httpx.Response(200, json={"foo": "bar"}))
+    async def test_method_get_content(self, async_client: AsyncWitanLabs, respx_mock: MockRouter) -> None:
+        respx_mock.get("/v0/files/x/content").mock(return_value=httpx.Response(200, json={"foo": "bar"}))
         file = await async_client.files.get_content(
             "x",
         )
@@ -365,8 +365,8 @@ class TestAsyncFiles:
 
     @parametrize
     @pytest.mark.respx(base_url=base_url)
-    async def test_raw_response_get_content(self, async_client: AsyncWitan, respx_mock: MockRouter) -> None:
-        respx_mock.get("/v1/files/x/content").mock(return_value=httpx.Response(200, json={"foo": "bar"}))
+    async def test_raw_response_get_content(self, async_client: AsyncWitanLabs, respx_mock: MockRouter) -> None:
+        respx_mock.get("/v0/files/x/content").mock(return_value=httpx.Response(200, json={"foo": "bar"}))
 
         file = await async_client.files.with_raw_response.get_content(
             "x",
@@ -379,8 +379,8 @@ class TestAsyncFiles:
 
     @parametrize
     @pytest.mark.respx(base_url=base_url)
-    async def test_streaming_response_get_content(self, async_client: AsyncWitan, respx_mock: MockRouter) -> None:
-        respx_mock.get("/v1/files/x/content").mock(return_value=httpx.Response(200, json={"foo": "bar"}))
+    async def test_streaming_response_get_content(self, async_client: AsyncWitanLabs, respx_mock: MockRouter) -> None:
+        respx_mock.get("/v0/files/x/content").mock(return_value=httpx.Response(200, json={"foo": "bar"}))
         async with async_client.files.with_streaming_response.get_content(
             "x",
         ) as file:
@@ -395,7 +395,7 @@ class TestAsyncFiles:
 
     @parametrize
     @pytest.mark.respx(base_url=base_url)
-    async def test_path_params_get_content(self, async_client: AsyncWitan) -> None:
+    async def test_path_params_get_content(self, async_client: AsyncWitanLabs) -> None:
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `file_id` but received ''"):
             await async_client.files.with_raw_response.get_content(
                 "",
@@ -403,13 +403,13 @@ class TestAsyncFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    async def test_method_upload(self, async_client: AsyncWitan) -> None:
+    async def test_method_upload(self, async_client: AsyncWitanLabs) -> None:
         file = await async_client.files.upload()
         assert_matches_type(FileUploadResponse, file, path=["response"])
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    async def test_raw_response_upload(self, async_client: AsyncWitan) -> None:
+    async def test_raw_response_upload(self, async_client: AsyncWitanLabs) -> None:
         response = await async_client.files.with_raw_response.upload()
 
         assert response.is_closed is True
@@ -419,7 +419,7 @@ class TestAsyncFiles:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    async def test_streaming_response_upload(self, async_client: AsyncWitan) -> None:
+    async def test_streaming_response_upload(self, async_client: AsyncWitanLabs) -> None:
         async with async_client.files.with_streaming_response.upload() as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
