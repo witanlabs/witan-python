@@ -7,7 +7,7 @@ from typing import Any, cast
 
 import pytest
 
-from witan import WitanLabs, AsyncWitanLabs
+from witan import Witan, AsyncWitan
 from tests.utils import assert_matches_type
 from witan.types import ResponseCreateResponse
 
@@ -19,7 +19,7 @@ class TestResponses:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    def test_method_create(self, client: WitanLabs) -> None:
+    def test_method_create(self, client: Witan) -> None:
         response = client.responses.create(
             input=[
                 {
@@ -37,7 +37,7 @@ class TestResponses:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    def test_method_create_with_all_params(self, client: WitanLabs) -> None:
+    def test_method_create_with_all_params(self, client: Witan) -> None:
         response = client.responses.create(
             input=[
                 {
@@ -59,7 +59,7 @@ class TestResponses:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    def test_raw_response_create(self, client: WitanLabs) -> None:
+    def test_raw_response_create(self, client: Witan) -> None:
         http_response = client.responses.with_raw_response.create(
             input=[
                 {
@@ -81,7 +81,7 @@ class TestResponses:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    def test_streaming_response_create(self, client: WitanLabs) -> None:
+    def test_streaming_response_create(self, client: Witan) -> None:
         with client.responses.with_streaming_response.create(
             input=[
                 {
@@ -111,7 +111,7 @@ class TestAsyncResponses:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    async def test_method_create(self, async_client: AsyncWitanLabs) -> None:
+    async def test_method_create(self, async_client: AsyncWitan) -> None:
         response = await async_client.responses.create(
             input=[
                 {
@@ -129,7 +129,7 @@ class TestAsyncResponses:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    async def test_method_create_with_all_params(self, async_client: AsyncWitanLabs) -> None:
+    async def test_method_create_with_all_params(self, async_client: AsyncWitan) -> None:
         response = await async_client.responses.create(
             input=[
                 {
@@ -151,7 +151,7 @@ class TestAsyncResponses:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    async def test_raw_response_create(self, async_client: AsyncWitanLabs) -> None:
+    async def test_raw_response_create(self, async_client: AsyncWitan) -> None:
         http_response = await async_client.responses.with_raw_response.create(
             input=[
                 {
@@ -173,7 +173,7 @@ class TestAsyncResponses:
 
     @pytest.mark.skip(reason="Prism tests are disabled")
     @parametrize
-    async def test_streaming_response_create(self, async_client: AsyncWitanLabs) -> None:
+    async def test_streaming_response_create(self, async_client: AsyncWitan) -> None:
         async with async_client.responses.with_streaming_response.create(
             input=[
                 {
