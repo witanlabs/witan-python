@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+from typing import Mapping, cast
+
 import httpx
 
-from ..types import file_list_params
-from .._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from .._utils import maybe_transform, async_maybe_transform
+from ..types import file_list_params, file_upload_params
+from .._types import Body, Omit, Query, Headers, NotGiven, FileTypes, omit, not_given
+from .._utils import extract_files, maybe_transform, deepcopy_minimal, async_maybe_transform
 from .._compat import cached_property
 from .._resource import SyncAPIResource, AsyncAPIResource
 from .._response import (
@@ -23,7 +25,8 @@ from .._response import (
     async_to_custom_raw_response_wrapper,
     async_to_custom_streamed_response_wrapper,
 )
-from .._base_client import make_request_options
+from ..pagination import SyncCursor, AsyncCursor
+from .._base_client import AsyncPaginator, make_request_options
 from ..types.file_list_response import FileListResponse
 from ..types.file_delete_response import FileDeleteResponse
 from ..types.file_upload_response import FileUploadResponse
@@ -39,7 +42,7 @@ class FilesResource(SyncAPIResource):
         This property can be used as a prefix for any HTTP method call to return
         the raw response object instead of the parsed content.
 
-        For more information, see https://www.github.com/stainless-sdks/witan-python#accessing-raw-response-data-eg-headers
+        For more information, see https://www.github.com/witanlabs/witan-python#accessing-raw-response-data-eg-headers
         """
         return FilesResourceWithRawResponse(self)
 
@@ -48,7 +51,7 @@ class FilesResource(SyncAPIResource):
         """
         An alternative to `.with_raw_response` that doesn't eagerly read the response body.
 
-        For more information, see https://www.github.com/stainless-sdks/witan-python#with_streaming_response
+        For more information, see https://www.github.com/witanlabs/witan-python#with_streaming_response
         """
         return FilesResourceWithStreamingResponse(self)
 
@@ -96,7 +99,7 @@ class FilesResource(SyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> FileListResponse:
+    ) -> SyncCursor[FileListResponse]:
         """
         Returns a list of files.
 
@@ -109,8 +112,9 @@ class FilesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        return self._get(
+        return self._get_api_list(
             "/v0/files",
+            page=SyncCursor[FileListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -124,7 +128,7 @@ class FilesResource(SyncAPIResource):
                     file_list_params.FileListParams,
                 ),
             ),
-            cast_to=FileListResponse,
+            model=FileListResponse,
         )
 
     def delete(
@@ -197,6 +201,7 @@ class FilesResource(SyncAPIResource):
     def upload(
         self,
         *,
+        file: FileTypes,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -204,9 +209,28 @@ class FilesResource(SyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> FileUploadResponse:
-        """Upload a file that can be referenced in the Responses API."""
+        """
+        Upload a file that can be referenced in the Responses API.
+
+        Args:
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        body = deepcopy_minimal({"file": file})
+        files = extract_files(cast(Mapping[str, object], body), paths=[["file"]])
+        # It should be noted that the actual Content-Type header that will be
+        # sent to the server will contain a `boundary` parameter, e.g.
+        # multipart/form-data; boundary=---abc--
+        extra_headers = {"Content-Type": "multipart/form-data", **(extra_headers or {})}
         return self._post(
             "/v0/files",
+            body=maybe_transform(body, file_upload_params.FileUploadParams),
+            files=files,
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -221,7 +245,7 @@ class AsyncFilesResource(AsyncAPIResource):
         This property can be used as a prefix for any HTTP method call to return
         the raw response object instead of the parsed content.
 
-        For more information, see https://www.github.com/stainless-sdks/witan-python#accessing-raw-response-data-eg-headers
+        For more information, see https://www.github.com/witanlabs/witan-python#accessing-raw-response-data-eg-headers
         """
         return AsyncFilesResourceWithRawResponse(self)
 
@@ -230,7 +254,7 @@ class AsyncFilesResource(AsyncAPIResource):
         """
         An alternative to `.with_raw_response` that doesn't eagerly read the response body.
 
-        For more information, see https://www.github.com/stainless-sdks/witan-python#with_streaming_response
+        For more information, see https://www.github.com/witanlabs/witan-python#with_streaming_response
         """
         return AsyncFilesResourceWithStreamingResponse(self)
 
@@ -267,7 +291,7 @@ class AsyncFilesResource(AsyncAPIResource):
             cast_to=FileRetrieveResponse,
         )
 
-    async def list(
+    def list(
         self,
         *,
         after: str | Omit = omit,
@@ -278,7 +302,7 @@ class AsyncFilesResource(AsyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> FileListResponse:
+    ) -> AsyncPaginator[FileListResponse, AsyncCursor[FileListResponse]]:
         """
         Returns a list of files.
 
@@ -291,14 +315,15 @@ class AsyncFilesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        return await self._get(
+        return self._get_api_list(
             "/v0/files",
+            page=AsyncCursor[FileListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
-                query=await async_maybe_transform(
+                query=maybe_transform(
                     {
                         "after": after,
                         "limit": limit,
@@ -306,7 +331,7 @@ class AsyncFilesResource(AsyncAPIResource):
                     file_list_params.FileListParams,
                 ),
             ),
-            cast_to=FileListResponse,
+            model=FileListResponse,
         )
 
     async def delete(
@@ -379,6 +404,7 @@ class AsyncFilesResource(AsyncAPIResource):
     async def upload(
         self,
         *,
+        file: FileTypes,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -386,9 +412,28 @@ class AsyncFilesResource(AsyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> FileUploadResponse:
-        """Upload a file that can be referenced in the Responses API."""
+        """
+        Upload a file that can be referenced in the Responses API.
+
+        Args:
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        body = deepcopy_minimal({"file": file})
+        files = extract_files(cast(Mapping[str, object], body), paths=[["file"]])
+        # It should be noted that the actual Content-Type header that will be
+        # sent to the server will contain a `boundary` parameter, e.g.
+        # multipart/form-data; boundary=---abc--
+        extra_headers = {"Content-Type": "multipart/form-data", **(extra_headers or {})}
         return await self._post(
             "/v0/files",
+            body=await async_maybe_transform(body, file_upload_params.FileUploadParams),
+            files=files,
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),

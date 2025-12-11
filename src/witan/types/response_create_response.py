@@ -1,6 +1,5 @@
 # File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import builtins
 from typing import List, Union, Optional
 from typing_extensions import Literal, TypeAlias
 
@@ -10,12 +9,14 @@ __all__ = [
     "ResponseCreateResponse",
     "Error",
     "Output",
-    "OutputUnionMember0",
-    "OutputUnionMember0Content",
-    "OutputUnionMember0ContentUnionMember0",
-    "OutputUnionMember0ContentUnionMember1",
-    "OutputUnionMember1",
-    "OutputUnionMember1Summary",
+    "OutputResponseOutputMessage",
+    "OutputResponseOutputMessageContent",
+    "OutputResponseOutputMessageContentResponseOutputText",
+    "OutputResponseOutputMessageContentResponseOutputTextAnnotation",
+    "OutputResponseOutputMessageContentResponseOutputRefusal",
+    "OutputResponseReasoning",
+    "OutputResponseReasoningSummary",
+    "Tool",
 ]
 
 
@@ -25,29 +26,33 @@ class Error(BaseModel):
     message: str
 
 
-class OutputUnionMember0ContentUnionMember0(BaseModel):
-    annotations: List[object]
+class OutputResponseOutputMessageContentResponseOutputTextAnnotation(BaseModel):
+    type: str
+
+
+class OutputResponseOutputMessageContentResponseOutputText(BaseModel):
+    annotations: List[OutputResponseOutputMessageContentResponseOutputTextAnnotation]
 
     text: str
 
     type: Literal["output_text"]
 
 
-class OutputUnionMember0ContentUnionMember1(BaseModel):
+class OutputResponseOutputMessageContentResponseOutputRefusal(BaseModel):
     refusal: str
 
     type: Literal["refusal"]
 
 
-OutputUnionMember0Content: TypeAlias = Union[
-    OutputUnionMember0ContentUnionMember0, OutputUnionMember0ContentUnionMember1
+OutputResponseOutputMessageContent: TypeAlias = Union[
+    OutputResponseOutputMessageContentResponseOutputText, OutputResponseOutputMessageContentResponseOutputRefusal
 ]
 
 
-class OutputUnionMember0(BaseModel):
+class OutputResponseOutputMessage(BaseModel):
     id: str
 
-    content: List[OutputUnionMember0Content]
+    content: List[OutputResponseOutputMessageContent]
 
     role: Literal["assistant"]
 
@@ -56,16 +61,16 @@ class OutputUnionMember0(BaseModel):
     type: Literal["message"]
 
 
-class OutputUnionMember1Summary(BaseModel):
+class OutputResponseReasoningSummary(BaseModel):
     text: str
 
     type: Literal["summary_text"]
 
 
-class OutputUnionMember1(BaseModel):
+class OutputResponseReasoning(BaseModel):
     id: str
 
-    summary: List[OutputUnionMember1Summary]
+    summary: List[OutputResponseReasoningSummary]
 
     type: Literal["reasoning"]
 
@@ -74,7 +79,11 @@ class OutputUnionMember1(BaseModel):
     status: Optional[Literal["in_progress", "completed", "incomplete"]] = None
 
 
-Output: TypeAlias = Union[OutputUnionMember0, OutputUnionMember1]
+Output: TypeAlias = Union[OutputResponseOutputMessage, OutputResponseReasoning]
+
+
+class Tool(BaseModel):
+    type: str
 
 
 class ResponseCreateResponse(BaseModel):
@@ -106,6 +115,6 @@ class ResponseCreateResponse(BaseModel):
 
     tool_choice: Literal["none"]
 
-    tools: List[builtins.object]
+    tools: List[Tool]
 
     top_p: None = None

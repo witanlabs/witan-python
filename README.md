@@ -16,12 +16,9 @@ The full API of this library can be found in [api.md](api.md).
 ## Installation
 
 ```sh
-# install from this staging repo
-pip install git+ssh://git@github.com/stainless-sdks/witan-python.git
+# install from PyPI
+pip install witan
 ```
-
-> [!NOTE]
-> Once this package is [published to PyPI](https://www.stainless.com/docs/guides/publish), this will become: `pip install witan`
 
 ## Usage
 
@@ -99,8 +96,8 @@ By default, the async client uses `httpx` for HTTP requests. However, for improv
 You can enable this by installing `aiohttp`:
 
 ```sh
-# install from this staging repo
-pip install 'witan[aiohttp] @ git+ssh://git@github.com/stainless-sdks/witan-python.git'
+# install from PyPI
+pip install witan[aiohttp]
 ```
 
 Then you can enable it by instantiating the client with `http_client=DefaultAioHttpClient()`:
@@ -144,6 +141,94 @@ Nested request parameters are [TypedDicts](https://docs.python.org/3/library/typ
 - Converting to a dictionary, `model.to_dict()`
 
 Typed requests and responses provide autocomplete and documentation within your editor. If you would like to see type errors in VS Code to help catch bugs earlier, set `python.analysis.typeCheckingMode` to `basic`.
+
+## Pagination
+
+List methods in the Witan API are paginated.
+
+This library provides auto-paginating iterators with each list response, so you do not have to request successive pages manually:
+
+```python
+from witan import Witan
+
+client = Witan()
+
+all_files = []
+# Automatically fetches more pages as needed.
+for file in client.files.list(
+    limit=10,
+):
+    # Do something with file here
+    all_files.append(file)
+print(all_files)
+```
+
+Or, asynchronously:
+
+```python
+import asyncio
+from witan import AsyncWitan
+
+client = AsyncWitan()
+
+
+async def main() -> None:
+    all_files = []
+    # Iterate through items across all pages, issuing requests as needed.
+    async for file in client.files.list(
+        limit=10,
+    ):
+        all_files.append(file)
+    print(all_files)
+
+
+asyncio.run(main())
+```
+
+Alternatively, you can use the `.has_next_page()`, `.next_page_info()`, or `.get_next_page()` methods for more granular control working with pages:
+
+```python
+first_page = await client.files.list(
+    limit=10,
+)
+if first_page.has_next_page():
+    print(f"will fetch next page using these details: {first_page.next_page_info()}")
+    next_page = await first_page.get_next_page()
+    print(f"number of items we just fetched: {len(next_page.data)}")
+
+# Remove `await` for non-async usage.
+```
+
+Or just work directly with the returned data:
+
+```python
+first_page = await client.files.list(
+    limit=10,
+)
+
+print(f"next page cursor: {first_page.last_id}")  # => "next page cursor: ..."
+for file in first_page.data:
+    print(file.id)
+
+# Remove `await` for non-async usage.
+```
+
+## File uploads
+
+Request parameters that correspond to file uploads can be passed as `bytes`, or a [`PathLike`](https://docs.python.org/3/library/os.html#os.PathLike) instance or a tuple of `(filename, contents, media type)`.
+
+```python
+from pathlib import Path
+from witan import Witan
+
+client = Witan()
+
+client.files.upload(
+    file=Path("/path/to/file"),
+)
+```
+
+The async client uses the exact same interface. If you pass a [`PathLike`](https://docs.python.org/3/library/os.html#os.PathLike) instance, the file contents will be read asynchronously automatically.
 
 ## Handling errors
 
@@ -209,7 +294,7 @@ client.with_options(max_retries=5).files.list()
 
 ### Timeouts
 
-By default requests time out after 1 minute. You can configure this with a `timeout` option,
+By default requests time out after 1.67 hours. You can configure this with a `timeout` option,
 which accepts a float or an [`httpx.Timeout`](https://www.python-httpx.org/advanced/timeouts/#fine-tuning-the-configuration) object:
 
 ```python
@@ -217,7 +302,7 @@ from witan import Witan
 
 # Configure the default for all requests:
 client = Witan(
-    # 20 seconds (default is 1 minute)
+    # 20 seconds (default is 1.67 hours)
     timeout=20.0,
 )
 
@@ -272,12 +357,12 @@ response = client.files.with_raw_response.list()
 print(response.headers.get('X-My-Header'))
 
 file = response.parse()  # get the object that `files.list()` would have returned
-print(file.first_id)
+print(file.id)
 ```
 
-These methods return an [`APIResponse`](https://github.com/stainless-sdks/witan-python/tree/main/src/witan/_response.py) object.
+These methods return an [`APIResponse`](https://github.com/witanlabs/witan-python/tree/main/src/witan/_response.py) object.
 
-The async client returns an [`AsyncAPIResponse`](https://github.com/stainless-sdks/witan-python/tree/main/src/witan/_response.py) with the same structure, the only difference being `await`able methods for reading the response content.
+The async client returns an [`AsyncAPIResponse`](https://github.com/witanlabs/witan-python/tree/main/src/witan/_response.py) with the same structure, the only difference being `await`able methods for reading the response content.
 
 #### `.with_streaming_response`
 
@@ -381,7 +466,7 @@ This package generally follows [SemVer](https://semver.org/spec/v2.0.0.html) con
 
 We take backwards-compatibility seriously and work hard to ensure you can rely on a smooth upgrade experience.
 
-We are keen for your feedback; please open an [issue](https://www.github.com/stainless-sdks/witan-python/issues) with questions, bugs, or suggestions.
+We are keen for your feedback; please open an [issue](https://www.github.com/witanlabs/witan-python/issues) with questions, bugs, or suggestions.
 
 ### Determining the installed version
 
