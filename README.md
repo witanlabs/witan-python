@@ -35,20 +35,8 @@ client = Witan(
     api_key=os.environ.get("WITAN_API_KEY"),  # This is the default and can be omitted
 )
 
-response = client.responses.create(
-    input=[
-        {
-            "content": [
-                {
-                    "text": "x",
-                    "type": "input_text",
-                }
-            ],
-            "role": "user",
-        }
-    ],
-)
-print(response.id)
+files = client.files.list()
+print(files.first_id)
 ```
 
 While you can provide an `api_key` keyword argument,
@@ -71,20 +59,8 @@ client = AsyncWitan(
 
 
 async def main() -> None:
-    response = await client.responses.create(
-        input=[
-            {
-                "content": [
-                    {
-                        "text": "x",
-                        "type": "input_text",
-                    }
-                ],
-                "role": "user",
-            }
-        ],
-    )
-    print(response.id)
+    files = await client.files.list()
+    print(files.first_id)
 
 
 asyncio.run(main())
@@ -117,20 +93,8 @@ async def main() -> None:
         api_key=os.environ.get("WITAN_API_KEY"),  # This is the default and can be omitted
         http_client=DefaultAioHttpClient(),
     ) as client:
-        response = await client.responses.create(
-            input=[
-                {
-                    "content": [
-                        {
-                            "text": "x",
-                            "type": "input_text",
-                        }
-                    ],
-                    "role": "user",
-                }
-            ],
-        )
-        print(response.id)
+        files = await client.files.list()
+        print(files.first_id)
 
 
 asyncio.run(main())
@@ -144,6 +108,23 @@ Nested request parameters are [TypedDicts](https://docs.python.org/3/library/typ
 - Converting to a dictionary, `model.to_dict()`
 
 Typed requests and responses provide autocomplete and documentation within your editor. If you would like to see type errors in VS Code to help catch bugs earlier, set `python.analysis.typeCheckingMode` to `basic`.
+
+## File uploads
+
+Request parameters that correspond to file uploads can be passed as `bytes`, or a [`PathLike`](https://docs.python.org/3/library/os.html#os.PathLike) instance or a tuple of `(filename, contents, media type)`.
+
+```python
+from pathlib import Path
+from witan import Witan
+
+client = Witan()
+
+client.files.upload(
+    file=Path("/path/to/file"),
+)
+```
+
+The async client uses the exact same interface. If you pass a [`PathLike`](https://docs.python.org/3/library/os.html#os.PathLike) instance, the file contents will be read asynchronously automatically.
 
 ## Handling errors
 

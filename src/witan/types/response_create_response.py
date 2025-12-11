@@ -1,6 +1,5 @@
 # File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-import builtins
 from typing import List, Union, Optional
 from typing_extensions import Literal, TypeAlias
 
@@ -13,9 +12,11 @@ __all__ = [
     "OutputUnionMember0",
     "OutputUnionMember0Content",
     "OutputUnionMember0ContentUnionMember0",
+    "OutputUnionMember0ContentUnionMember0Annotation",
     "OutputUnionMember0ContentUnionMember1",
     "OutputUnionMember1",
     "OutputUnionMember1Summary",
+    "Tool",
 ]
 
 
@@ -25,8 +26,12 @@ class Error(BaseModel):
     message: str
 
 
+class OutputUnionMember0ContentUnionMember0Annotation(BaseModel):
+    type: str
+
+
 class OutputUnionMember0ContentUnionMember0(BaseModel):
-    annotations: List[object]
+    annotations: List[OutputUnionMember0ContentUnionMember0Annotation]
 
     text: str
 
@@ -77,6 +82,10 @@ class OutputUnionMember1(BaseModel):
 Output: TypeAlias = Union[OutputUnionMember0, OutputUnionMember1]
 
 
+class Tool(BaseModel):
+    type: str
+
+
 class ResponseCreateResponse(BaseModel):
     id: str
 
@@ -106,6 +115,6 @@ class ResponseCreateResponse(BaseModel):
 
     tool_choice: Literal["none"]
 
-    tools: List[builtins.object]
+    tools: List[Tool]
 
     top_p: None = None
