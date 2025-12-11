@@ -15,6 +15,7 @@ __all__ = [
     "InputUnionMember1",
     "InputUnionMember1Content",
     "InputUnionMember1ContentUnionMember0",
+    "InputUnionMember1ContentUnionMember0Annotation",
     "InputUnionMember1ContentUnionMember1",
     "InputUnionMember2",
     "InputUnionMember2Summary",
@@ -58,8 +59,12 @@ class InputUnionMember0(TypedDict, total=False):
     type: Literal["message"]
 
 
+class InputUnionMember1ContentUnionMember0Annotation(TypedDict, total=False):
+    type: Required[str]
+
+
 class InputUnionMember1ContentUnionMember0(TypedDict, total=False):
-    annotations: Required[Iterable[object]]
+    annotations: Required[Iterable[InputUnionMember1ContentUnionMember0Annotation]]
 
     text: Required[str]
 
