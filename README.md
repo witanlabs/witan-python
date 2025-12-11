@@ -35,8 +35,20 @@ client = Witan(
     api_key=os.environ.get("WITAN_API_KEY"),  # This is the default and can be omitted
 )
 
-page = client.files.list()
-print(page.data)
+response = client.responses.create(
+    input=[
+        {
+            "content": [
+                {
+                    "text": "x",
+                    "type": "input_text",
+                }
+            ],
+            "role": "user",
+        }
+    ],
+)
+print(response.id)
 ```
 
 While you can provide an `api_key` keyword argument,
@@ -59,8 +71,20 @@ client = AsyncWitan(
 
 
 async def main() -> None:
-    page = await client.files.list()
-    print(page.data)
+    response = await client.responses.create(
+        input=[
+            {
+                "content": [
+                    {
+                        "text": "x",
+                        "type": "input_text",
+                    }
+                ],
+                "role": "user",
+            }
+        ],
+    )
+    print(response.id)
 
 
 asyncio.run(main())
@@ -93,8 +117,20 @@ async def main() -> None:
         api_key=os.environ.get("WITAN_API_KEY"),  # This is the default and can be omitted
         http_client=DefaultAioHttpClient(),
     ) as client:
-        page = await client.files.list()
-        print(page.data)
+        response = await client.responses.create(
+            input=[
+                {
+                    "content": [
+                        {
+                            "text": "x",
+                            "type": "input_text",
+                        }
+                    ],
+                    "role": "user",
+                }
+            ],
+        )
+        print(response.id)
 
 
 asyncio.run(main())
@@ -108,6 +144,77 @@ Nested request parameters are [TypedDicts](https://docs.python.org/3/library/typ
 - Converting to a dictionary, `model.to_dict()`
 
 Typed requests and responses provide autocomplete and documentation within your editor. If you would like to see type errors in VS Code to help catch bugs earlier, set `python.analysis.typeCheckingMode` to `basic`.
+
+## Pagination
+
+List methods in the Witan API are paginated.
+
+This library provides auto-paginating iterators with each list response, so you do not have to request successive pages manually:
+
+```python
+from witan import Witan
+
+client = Witan()
+
+all_files = []
+# Automatically fetches more pages as needed.
+for file in client.files.list(
+    limit=10,
+):
+    # Do something with file here
+    all_files.append(file)
+print(all_files)
+```
+
+Or, asynchronously:
+
+```python
+import asyncio
+from witan import AsyncWitan
+
+client = AsyncWitan()
+
+
+async def main() -> None:
+    all_files = []
+    # Iterate through items across all pages, issuing requests as needed.
+    async for file in client.files.list(
+        limit=10,
+    ):
+        all_files.append(file)
+    print(all_files)
+
+
+asyncio.run(main())
+```
+
+Alternatively, you can use the `.has_next_page()`, `.next_page_info()`, or `.get_next_page()` methods for more granular control working with pages:
+
+```python
+first_page = await client.files.list(
+    limit=10,
+)
+if first_page.has_next_page():
+    print(f"will fetch next page using these details: {first_page.next_page_info()}")
+    next_page = await first_page.get_next_page()
+    print(f"number of items we just fetched: {len(next_page.data)}")
+
+# Remove `await` for non-async usage.
+```
+
+Or just work directly with the returned data:
+
+```python
+first_page = await client.files.list(
+    limit=10,
+)
+
+print(f"next page cursor: {first_page.last_id}")  # => "next page cursor: ..."
+for file in first_page.data:
+    print(file.id)
+
+# Remove `await` for non-async usage.
+```
 
 ## File uploads
 
