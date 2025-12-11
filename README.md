@@ -35,8 +35,8 @@ client = Witan(
     api_key=os.environ.get("WITAN_API_KEY"),  # This is the default and can be omitted
 )
 
-files = client.files.list()
-print(files.first_id)
+page = client.files.list()
+print(page.data)
 ```
 
 While you can provide an `api_key` keyword argument,
@@ -59,8 +59,8 @@ client = AsyncWitan(
 
 
 async def main() -> None:
-    files = await client.files.list()
-    print(files.first_id)
+    page = await client.files.list()
+    print(page.data)
 
 
 asyncio.run(main())
@@ -93,8 +93,8 @@ async def main() -> None:
         api_key=os.environ.get("WITAN_API_KEY"),  # This is the default and can be omitted
         http_client=DefaultAioHttpClient(),
     ) as client:
-        files = await client.files.list()
-        print(files.first_id)
+        page = await client.files.list()
+        print(page.data)
 
 
 asyncio.run(main())
@@ -253,7 +253,7 @@ response = client.files.with_raw_response.list()
 print(response.headers.get('X-My-Header'))
 
 file = response.parse()  # get the object that `files.list()` would have returned
-print(file.first_id)
+print(file.id)
 ```
 
 These methods return an [`APIResponse`](https://github.com/witanlabs/witan-python/tree/main/src/witan/_response.py) object.
