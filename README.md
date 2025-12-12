@@ -32,13 +32,28 @@ client = Witan(
     api_key=os.environ.get("WITAN_API_KEY"),  # This is the default and can be omitted
 )
 
+def file_to_data_url(filepath: str) -> str:
+    with open(filepath, "rb") as f:
+        file_bytes = f.read()
+    file_base64 = base64.b64encode(file_bytes).decode("utf-8")
+    mime_type, _ = mimetypes.guess_type(filepath)
+    mime_type = mime_type or "application/octet-stream"
+    return f"data:{mime_type};base64,{file_base64}"
+
+filepath = "path/to/file.xlsx"
+
 response = client.responses.create(
     input=[
         {
             "content": [
                 {
-                    "text": "x",
+                    "text": "Your question",
                     "type": "input_text",
+                },
+                {
+                    "type": "input_file",
+                    "filename": os.path.basename(filepath),
+                    "file_data": file_to_data_url(filepath),
                 }
             ],
             "role": "user",
