@@ -77,7 +77,7 @@ class Witan(SyncAPIClient):
         if base_url is None:
             base_url = os.environ.get("WITAN_BASE_URL")
         if base_url is None:
-            base_url = f"https://api.dev.witanlabs.com"
+            base_url = f"https://api.witanlabs.com"
 
         super().__init__(
             version=__version__,
@@ -256,7 +256,7 @@ class AsyncWitan(AsyncAPIClient):
         if base_url is None:
             base_url = os.environ.get("WITAN_BASE_URL")
         if base_url is None:
-            base_url = f"https://api.dev.witanlabs.com"
+            base_url = f"https://api.witanlabs.com"
 
         super().__init__(
             version=__version__,

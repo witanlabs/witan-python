@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.2.0 (2025-12-12)
+
+Full Changelog: [v0.1.0...v0.2.0](https://github.com/witanlabs/witan-python/compare/v0.1.0...v0.2.0)
+
+### Features
+
+* **api:** manual updates ([fb149ba](https://github.com/witanlabs/witan-python/commit/fb149ba0e6d9022ae875178119bdb6686e6d9844))
+
 ## 0.1.0 (2025-12-11)
 
 Full Changelog: [v0.0.1...v0.1.0](https://github.com/witanlabs/witan-python/compare/v0.0.1...v0.1.0)
