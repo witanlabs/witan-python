@@ -107,7 +107,7 @@ class ResponseCreateResponse(BaseModel):
 
     output_text: str
 
-    parallel_tool_calls: bool
+    parallel_tool_calls: Literal[False]
 
     status: Literal["completed", "in_progress", "failed"]
 
