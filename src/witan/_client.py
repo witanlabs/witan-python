@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import os
-from typing import Any, Mapping
+from typing import TYPE_CHECKING, Any, Mapping
 from typing_extensions import Self, override
 
 import httpx
@@ -21,8 +21,8 @@ from ._types import (
     not_given,
 )
 from ._utils import is_given, get_async_library
+from ._compat import cached_property
 from ._version import __version__
-from .resources import files, responses
 from ._streaming import Stream as Stream, AsyncStream as AsyncStream
 from ._exceptions import APIStatusError
 from ._base_client import (
@@ -31,15 +31,15 @@ from ._base_client import (
     AsyncAPIClient,
 )
 
+if TYPE_CHECKING:
+    from .resources import files, responses
+    from .resources.files import FilesResource, AsyncFilesResource
+    from .resources.responses import ResponsesResource, AsyncResponsesResource
+
 __all__ = ["Timeout", "Transport", "ProxiesTypes", "RequestOptions", "Witan", "AsyncWitan", "Client", "AsyncClient"]
 
 
 class Witan(SyncAPIClient):
-    files: files.FilesResource
-    responses: responses.ResponsesResource
-    with_raw_response: WitanWithRawResponse
-    with_streaming_response: WitanWithStreamedResponse
-
     # client options
     api_key: str | None
 
@@ -90,10 +90,25 @@ class Witan(SyncAPIClient):
             _strict_response_validation=_strict_response_validation,
         )
 
-        self.files = files.FilesResource(self)
-        self.responses = responses.ResponsesResource(self)
-        self.with_raw_response = WitanWithRawResponse(self)
-        self.with_streaming_response = WitanWithStreamedResponse(self)
+    @cached_property
+    def files(self) -> FilesResource:
+        from .resources.files import FilesResource
+
+        return FilesResource(self)
+
+    @cached_property
+    def responses(self) -> ResponsesResource:
+        from .resources.responses import ResponsesResource
+
+        return ResponsesResource(self)
+
+    @cached_property
+    def with_raw_response(self) -> WitanWithRawResponse:
+        return WitanWithRawResponse(self)
+
+    @cached_property
+    def with_streaming_response(self) -> WitanWithStreamedResponse:
+        return WitanWithStreamedResponse(self)
 
     @property
     @override
@@ -119,9 +134,7 @@ class Witan(SyncAPIClient):
 
     @override
     def _validate_headers(self, headers: Headers, custom_headers: Headers) -> None:
-        if self.api_key and headers.get("Authorization"):
-            return
-        if isinstance(custom_headers.get("Authorization"), Omit):
+        if headers.get("Authorization") or isinstance(custom_headers.get("Authorization"), Omit):
             return
 
         raise TypeError(
@@ -214,11 +227,6 @@ class Witan(SyncAPIClient):
 
 
 class AsyncWitan(AsyncAPIClient):
-    files: files.AsyncFilesResource
-    responses: responses.AsyncResponsesResource
-    with_raw_response: AsyncWitanWithRawResponse
-    with_streaming_response: AsyncWitanWithStreamedResponse
-
     # client options
     api_key: str | None
 
@@ -269,10 +277,25 @@ class AsyncWitan(AsyncAPIClient):
             _strict_response_validation=_strict_response_validation,
         )
 
-        self.files = files.AsyncFilesResource(self)
-        self.responses = responses.AsyncResponsesResource(self)
-        self.with_raw_response = AsyncWitanWithRawResponse(self)
-        self.with_streaming_response = AsyncWitanWithStreamedResponse(self)
+    @cached_property
+    def files(self) -> AsyncFilesResource:
+        from .resources.files import AsyncFilesResource
+
+        return AsyncFilesResource(self)
+
+    @cached_property
+    def responses(self) -> AsyncResponsesResource:
+        from .resources.responses import AsyncResponsesResource
+
+        return AsyncResponsesResource(self)
+
+    @cached_property
+    def with_raw_response(self) -> AsyncWitanWithRawResponse:
+        return AsyncWitanWithRawResponse(self)
+
+    @cached_property
+    def with_streaming_response(self) -> AsyncWitanWithStreamedResponse:
+        return AsyncWitanWithStreamedResponse(self)
 
     @property
     @override
@@ -298,9 +321,7 @@ class AsyncWitan(AsyncAPIClient):
 
     @override
     def _validate_headers(self, headers: Headers, custom_headers: Headers) -> None:
-        if self.api_key and headers.get("Authorization"):
-            return
-        if isinstance(custom_headers.get("Authorization"), Omit):
+        if headers.get("Authorization") or isinstance(custom_headers.get("Authorization"), Omit):
             return
 
         raise TypeError(
@@ -393,27 +414,79 @@ class AsyncWitan(AsyncAPIClient):
 
 
 class WitanWithRawResponse:
+    _client: Witan
+
     def __init__(self, client: Witan) -> None:
-        self.files = files.FilesResourceWithRawResponse(client.files)
-        self.responses = responses.ResponsesResourceWithRawResponse(client.responses)
+        self._client = client
+
+    @cached_property
+    def files(self) -> files.FilesResourceWithRawResponse:
+        from .resources.files import FilesResourceWithRawResponse
+
+        return FilesResourceWithRawResponse(self._client.files)
+
+    @cached_property
+    def responses(self) -> responses.ResponsesResourceWithRawResponse:
+        from .resources.responses import ResponsesResourceWithRawResponse
+
+        return ResponsesResourceWithRawResponse(self._client.responses)
 
 
 class AsyncWitanWithRawResponse:
+    _client: AsyncWitan
+
     def __init__(self, client: AsyncWitan) -> None:
-        self.files = files.AsyncFilesResourceWithRawResponse(client.files)
-        self.responses = responses.AsyncResponsesResourceWithRawResponse(client.responses)
+        self._client = client
+
+    @cached_property
+    def files(self) -> files.AsyncFilesResourceWithRawResponse:
+        from .resources.files import AsyncFilesResourceWithRawResponse
+
+        return AsyncFilesResourceWithRawResponse(self._client.files)
+
+    @cached_property
+    def responses(self) -> responses.AsyncResponsesResourceWithRawResponse:
+        from .resources.responses import AsyncResponsesResourceWithRawResponse
+
+        return AsyncResponsesResourceWithRawResponse(self._client.responses)
 
 
 class WitanWithStreamedResponse:
+    _client: Witan
+
     def __init__(self, client: Witan) -> None:
-        self.files = files.FilesResourceWithStreamingResponse(client.files)
-        self.responses = responses.ResponsesResourceWithStreamingResponse(client.responses)
+        self._client = client
+
+    @cached_property
+    def files(self) -> files.FilesResourceWithStreamingResponse:
+        from .resources.files import FilesResourceWithStreamingResponse
+
+        return FilesResourceWithStreamingResponse(self._client.files)
+
+    @cached_property
+    def responses(self) -> responses.ResponsesResourceWithStreamingResponse:
+        from .resources.responses import ResponsesResourceWithStreamingResponse
+
+        return ResponsesResourceWithStreamingResponse(self._client.responses)
 
 
 class AsyncWitanWithStreamedResponse:
+    _client: AsyncWitan
+
     def __init__(self, client: AsyncWitan) -> None:
-        self.files = files.AsyncFilesResourceWithStreamingResponse(client.files)
-        self.responses = responses.AsyncResponsesResourceWithStreamingResponse(client.responses)
+        self._client = client
+
+    @cached_property
+    def files(self) -> files.AsyncFilesResourceWithStreamingResponse:
+        from .resources.files import AsyncFilesResourceWithStreamingResponse
+
+        return AsyncFilesResourceWithStreamingResponse(self._client.files)
+
+    @cached_property
+    def responses(self) -> responses.AsyncResponsesResourceWithStreamingResponse:
+        from .resources.responses import AsyncResponsesResourceWithStreamingResponse
+
+        return AsyncResponsesResourceWithStreamingResponse(self._client.responses)
 
 
 Client = Witan
